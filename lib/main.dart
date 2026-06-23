@@ -1,3 +1,4 @@
+import 'package:ai_app/presentations/providers/chat_provider.dart';
 import 'package:ai_app/presentations/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
 
         ChangeNotifierProvider(create: (_) => ChatProvider()),
 
-        ChangeNotifierProvider(create: (_) => ImageProvider()),
+        //ChangeNotifierProvider(create: (_) => ImageProvider()),
 
       ],
 
