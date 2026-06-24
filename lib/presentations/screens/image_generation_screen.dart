@@ -1,64 +1,70 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class ImageGeneratorScreen extends StatelessWidget {
+import '../providers/image_provider.dart';
+
+class ImageGeneratorScreen extends StatefulWidget {
   const ImageGeneratorScreen({super.key});
 
   @override
+  State<ImageGeneratorScreen> createState() => _ImageGeneratorScreenState();
+}
+
+class _ImageGeneratorScreenState extends State<ImageGeneratorScreen> {
+  final controller = TextEditingController();
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final isWeb = MediaQuery.of(context).size.width > 700;
+
+    final provider = context.watch<AIImageProvider>();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Image Generator"),
+        title: const Text("AI Image Generator"),
       ),
-      body: Center(
-        child: SizedBox(
-          width: isWeb ? 600 : double.infinity,
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: ListView(
-              children: [
-
-                TextField(
-                  maxLines: 3,
-                  decoration: InputDecoration(
-                    hintText: "Describe your image...",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                SizedBox(
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    child: const Text(
-                      "Generate Image",
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 30),
-
-                Container(
-                  height: 350,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    color: Colors.grey.shade900,
-                  ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.image,
-                      size: 100,
-                    ),
-                  ),
-                )
-              ],
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            TextField(
+              controller: controller,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                hintText: "Describe image...",
+                border: OutlineInputBorder(),
+              ),
             ),
-          ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                if (controller.text.isNotEmpty) {
+                  provider.generate(controller.text);
+                }
+              },
+              child: const Text("Generate"),
+            ),
+            const SizedBox(height: 20),
+
+            if (provider.loading)
+              const CircularProgressIndicator()
+            else if (provider.image != null)
+              Expanded(
+                child: InteractiveViewer(
+                  child: Image.memory(
+                    provider.image!,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              )
+            else
+              const Text("No image generated yet"),
+          ],
         ),
       ),
     );
